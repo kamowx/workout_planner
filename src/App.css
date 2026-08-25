@@ -54,7 +54,6 @@ body {
   border-left-color: #1245bc !important;
 }
 
-/* 3 блока статистики */
 .stat-card2 {
   display: flex;
   flex-direction: column;

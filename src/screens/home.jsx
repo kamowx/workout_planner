@@ -6,16 +6,13 @@ function Home() {
   const [time, setTime] = useState("");
   const [calories, setCalories] = useState("");
 
-  // Получаем  localStorage
   const [data, setData] = useState(
     JSON.parse(localStorage.getItem("data")) || [],
   );
 
   function Save() {
-    // Получаем старые тренировки
     let oldData = JSON.parse(localStorage.getItem("data")) || [];
 
-    // Создаём новую тренировку
     let newData = {
       name: name,
       lesson: lesson,
@@ -23,16 +20,12 @@ function Home() {
       calories: calories,
     };
 
-    // Добавляем новую тренировку
     oldData.push(newData);
 
-    // Сохраняем тренировки
     localStorage.setItem("data", JSON.stringify(oldData));
 
-    // Обновляем список на странице
     setData(oldData);
 
-    // Очищаем поля
     setName("");
     setLesson("");
     setTime("");
@@ -41,41 +34,28 @@ function Home() {
     alert("Тренировка сохранена");
   }
 
-  // Удалить одну тренировку
   function Remove(index) {
-    // Создаём пустой массив
     let newData = [];
 
-    // Перебираем все тренировки
     for (let i = 0; i < data.length; i++) {
-      // Если это НЕ та тренировка,
-      // которую хотим удалить
       if (i !== index) {
-        // Добавляем её в новый массив
         newData.push(data[i]);
       }
     }
 
-    // Сохраняем новый массив
     localStorage.setItem("data", JSON.stringify(newData));
 
-    // Показываем новый массив
     setData(newData);
   }
 
-  // Удалить все тренировки
   function RemoveAll() {
-    // Удаляем данные
     localStorage.removeItem("data");
 
-    // Очищаем список
     setData([]);
   }
 
-  // Считаем все калории
   let result_calories = 0;
 
-  // Перебираем все тренировки
   for (let i = 0; i < data.length; i++) {
     result_calories = result_calories + Number(data[i].calories);
   }
@@ -174,7 +154,6 @@ function Home() {
                       <div className="d-flex gap-2">
                         <button
                           onClick={() => {
-                            // Сохраняем выбранную тренировку
                             localStorage.setItem(
                               "openData",
                               JSON.stringify(item),
@@ -203,7 +182,6 @@ function Home() {
         </div>
       </div>
 
-      {/* Окно добавления */}
       <div
         className="modal fade"
         id="exampleModal"
@@ -213,7 +191,6 @@ function Home() {
       >
         <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content">
-            {/* Заголовок окна */}
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
                 Добавить тренировку
@@ -226,9 +203,7 @@ function Home() {
               ></button>
             </div>
 
-            {/* Поля */}
             <div className="modal-body">
-              {/* Название тренировки */}
               <div className="mb-3">
                 <label className="form-label">Название тренировки</label>
 
@@ -241,7 +216,6 @@ function Home() {
                 />
               </div>
 
-              {/* Название упражнения */}
               <div className="mb-3">
                 <label className="form-label">Название упражнения</label>
 
@@ -254,7 +228,6 @@ function Home() {
                 />
               </div>
 
-              {/* Время */}
               <div className="mb-3">
                 <label className="form-label">Длительность (сек)</label>
 
@@ -267,7 +240,6 @@ function Home() {
                 />
               </div>
 
-              {/* Калории */}
               <div className="mb-3">
                 <label className="form-label">Калории</label>
 
@@ -280,7 +252,6 @@ function Home() {
                 />
               </div>
 
-              {/* Отдых */}
               <div className="mb-3">
                 <label className="form-label">Отдых (сек)</label>
 
@@ -292,7 +263,6 @@ function Home() {
               </div>
             </div>
 
-            {/* Кнопки */}
             <div className="modal-footer">
               <button
                 type="button"
