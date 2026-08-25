@@ -146,7 +146,7 @@ function Home() {
               <h2 className="section-title mb-0">Список тренировок</h2>
 
               <button onClick={RemoveAll} className="btn btn-danger">
-                Удалить всё
+                Удалить всё.
               </button>
             </div>
 
