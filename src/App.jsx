@@ -8,6 +8,8 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./App.css";
 
 import Home from "./screens/home";
+import Timer from "./screens/timer";
+import History from "./screens/history";
 
 function App() {
   return (
@@ -15,6 +17,8 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/timer" element={<Timer />} />
+          <Route path="/history" element={<History />} />
         </Routes>
       </BrowserRouter>
     </>

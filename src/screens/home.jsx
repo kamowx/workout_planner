@@ -6,6 +6,8 @@ function Home() {
   const [time, setTime] = useState("");
   const [calories, setCalories] = useState("");
 
+  const [timer, setTimer] = useState("");
+
   const [data, setData] = useState(
     JSON.parse(localStorage.getItem("data")) || [],
   );
@@ -32,6 +34,12 @@ function Home() {
     setCalories("");
 
     alert("Тренировка сохранена");
+  }
+
+  function Start(item) {
+    localStorage.setItem("time", item.time);
+
+    window.location.href = "/timer";
   }
 
   function Remove(index) {
@@ -75,12 +83,22 @@ function Home() {
           <div>
             <button
               type="button"
-              className="btn btn-primary-custom"
+              className="btn btn-primary-custom me-2"
               data-bs-toggle="modal"
               data-bs-target="#exampleModal"
             >
               + Добавить тренировку
             </button>
+            <a href="history">
+              <button
+                type="button"
+                className="btn btn-primary-custom"
+                data-bs-toggle="modal"
+                data-bs-target="#exampleModal"
+              >
+                История
+              </button>
+            </a>
           </div>
         </div>
       </div>
@@ -153,19 +171,12 @@ function Home() {
 
                       <div className="d-flex gap-2">
                         <button
-                          onClick={() => {
-                            localStorage.setItem(
-                              "openData",
-                              JSON.stringify(item),
-                            );
-
-                            window.location.href = "";
-                          }}
+                          onClick={() => Start(item)}
                           className="btn btn-primary"
                         >
                           Начать
                         </button>
-
+                        ;
                         <button
                           onClick={() => Remove(index)}
                           className="btn btn-danger"
