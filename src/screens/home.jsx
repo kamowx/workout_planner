@@ -8,6 +8,43 @@ function Home() {
 
   const [timer, setTimer] = useState("");
 
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  const [editName, setEditName] = useState("");
+  const [editCalories, setEditCalories] = useState("");
+  const [editText, setEditText] = useState("");
+  const [editTime, setEditTime] = useState("");
+
+  const [editIndex, setEditIndex] = useState(null);
+
+  function Edit(index) {
+    setEditIndex(index);
+
+    setEditName(data[index].name);
+    setEditText(data[index].lesson);
+    setEditCalories(data[index].calories);
+    setEditTime(data[index].time);
+
+    setShowEditModal(true);
+  }
+
+  function SaveEdit() {
+    let newData = [...data];
+
+    newData[editIndex].name = editName;
+    newData[editIndex].lesson = editText;
+    newData[editIndex].calories = editCalories;
+    newData[editIndex].time = editTime;
+
+    localStorage.setItem("data", JSON.stringify(newData));
+
+    setData(newData);
+
+    setShowEditModal(false);
+
+    alert("Изменения сохранены!");
+  }
+
   const [data, setData] = useState(
     JSON.parse(localStorage.getItem("data")) || [],
   );
@@ -89,6 +126,7 @@ function Home() {
             >
               + Добавить тренировку
             </button>
+
             <a href="history">
               <button
                 type="button"
@@ -170,6 +208,103 @@ function Home() {
                       </div>
 
                       <div className="d-flex gap-2">
+                        <button
+                          className="btn btn-primary"
+                          onClick={() => Edit(index)}
+                        >
+                          Редактировать
+                        </button>
+                        {showEditModal && (
+                          <div
+                            className="modal fade show d-block"
+                            tabIndex="-1"
+                            style={{
+                              backgroundColor: "rgba(0,0,0,0.5)",
+                            }}
+                          >
+                            <div className="modal-dialog">
+                              <div className="modal-content">
+                                <div className="modal-header">
+                                  <h5 className="modal-title fw-bold">
+                                    Редактировать
+                                  </h5>
+
+                                  <button
+                                    type="button"
+                                    className="btn-close"
+                                    onClick={() => setShowEditModal(false)}
+                                  ></button>
+                                </div>
+
+                                <div className="modal-body">
+                                  <div className="mb-3">
+                                    <label className="form-label">
+                                      Названия
+                                    </label>
+
+                                    <input
+                                      type="text"
+                                      className="form-control"
+                                      placeholder="Имя..."
+                                      value={editName}
+                                      onChange={(e) =>
+                                        setEditName(e.target.value)
+                                      }
+                                    />
+                                  </div>
+
+                                  <div className="mb-3">
+                                    <label className="form-label">
+                                      Калории
+                                    </label>
+
+                                    <input
+                                      type="text"
+                                      className="form-control"
+                                      placeholder="50"
+                                      value={editCalories}
+                                      onChange={(e) =>
+                                        setEditCalories(e.target.value)
+                                      }
+                                    />
+                                  </div>
+
+                                  <div className="mb-3">
+                                    <label className="form-label">Секунд</label>
+
+                                    <input
+                                      className="form-control"
+                                      rows="3"
+                                      placeholder="..."
+                                      value={editTime}
+                                      onChange={(e) =>
+                                        setEditTime(e.target.value)
+                                      }
+                                    />
+                                  </div>
+                                </div>
+
+                                <div className="modal-footer">
+                                  <button
+                                    type="button"
+                                    className="btn btn-secondary"
+                                    onClick={() => setShowEditModal(false)}
+                                  >
+                                    Закрыть
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    className="btn btn-primary"
+                                    onClick={SaveEdit}
+                                  >
+                                    Сохранить
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                         <button
                           onClick={() => Start(item)}
                           className="btn btn-primary"
