@@ -159,19 +159,17 @@ function Home() {
     }
   };
 
-  // DELETE
-  const RemoveAll = async (data) => {
+  // DELETE ALL
+  const RemoveAll = async () => {
     try {
-      const response = await axios({
-        method: "DELETE",
-        url: `https://6aa686bbd7765db985076c1a.mockapi.io/subscription`,
-      });
-
-      console.log("DELETE", response);
-
-      if (response.status === 200) {
-        newData();
+      for (let item of data) {
+        await axios({
+          method: "DELETE",
+          url: `https://6aa686bbd7765db985076c1a.mockapi.io/subscription/${item.id}`,
+        });
       }
+
+      newData();
     } catch (error) {
       console.error(error);
     }

@@ -1,14 +1,23 @@
-import { useState, useEffect } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 function History() {
-  const [data, setData] = useState([]);
+  // Массив тренировок
+  const [subscriptions, setSubscriptions] = useState([]);
 
   // GET
-  const newData = async () => {
+  const subscription = async () => {
     try {
-      const oldHistory = JSON.parse(localStorage.getItem("history")) || [];
+      const response = await axios({
+        method: "GET",
+        url: "https://6aa686bbd7765db985076c1a.mockapi.io/history",
+      });
 
-      setData(oldHistory);
+      console.log("GET", response);
+
+      if (response.status === 200) {
+        setSubscriptions(response.data);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -16,7 +25,7 @@ function History() {
 
   // Получаем данные при открытии
   useEffect(() => {
-    newData();
+    subscription();
   }, []);
 
   return (
@@ -24,20 +33,20 @@ function History() {
       <div className="card p-5">
         <h2>История</h2>
 
-        {data.length === 0 ? (
+        {subscriptions.length === 0 ? (
           <h1>
             <b>Пока что нет</b>
           </h1>
         ) : (
-          data.map((item, index) => (
+          subscriptions.map((item, index) => (
             <div className="card p-3 mt-3" key={index}>
-              <h4>Тренировка</h4>
+              <h4>{item.name}</h4>
 
-              <p>Секунд: {item.seconds}</p>
+              <p>Упражнение: {item.lesson}</p>
 
-              <p>Дата: {item.date}</p>
+              <p>Калории: {item.calories}</p>
 
-              <p>Время: {item.time}</p>
+              <p>Секунд: {item.time}</p>
             </div>
           ))
         )}
