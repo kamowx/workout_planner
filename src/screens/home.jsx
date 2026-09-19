@@ -1,4 +1,5 @@
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 function Home() {
   const [name, setName] = useState("");
@@ -16,9 +17,11 @@ function Home() {
   const [editTime, setEditTime] = useState("");
 
   const [editIndex, setEditIndex] = useState(null);
+  const [editId, setEditId] = useState(null);
 
   function Edit(index) {
     setEditIndex(index);
+    setEditId(data[index].id);
 
     setEditName(data[index].name);
     setEditText(data[index].lesson);
@@ -28,50 +31,109 @@ function Home() {
     setShowEditModal(true);
   }
 
-  function SaveEdit() {
-    let newData = [...data];
+  //Edit
+  const SaveEdit = async () => {
+    if (
+      !editName.trim() ||
+      !editText.trim() ||
+      !editCalories.trim() ||
+      !editTime.trim()
+    ) {
+      return;
+    }
 
-    newData[editIndex].name = editName;
-    newData[editIndex].lesson = editText;
-    newData[editIndex].calories = editCalories;
-    newData[editIndex].time = editTime;
+    try {
+      const response = await axios({
+        method: "PUT",
+        url: `https://6aa686bbd7765db985076c1a.mockapi.io/subscription/${editId}`,
+        data: {
+          name: editName,
+          lesson: editText,
+          calories: editCalories,
+          time: editTime,
+        },
+      });
 
-    localStorage.setItem("data", JSON.stringify(newData));
+      console.log("PUT", response);
 
-    setData(newData);
+      if (response.status === 200 || response.status === 201) {
+        newData();
 
-    setShowEditModal(false);
+        setShowEditModal(false);
 
-    alert("Изменения сохранены!");
-  }
+        alert("Редактирован");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-  const [data, setData] = useState(
-    JSON.parse(localStorage.getItem("data")) || [],
+  const [data, setData] = useState([]);
+
+  //GET
+
+  const newData = async () => {
+    try {
+      const response = await axios({
+        method: "GET",
+        url: "https://6aa686bbd7765db985076c1a.mockapi.io/subscription",
+      });
+
+      console.log("GET", response);
+
+      if (response.status === 200) {
+        setData(response.data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    newData();
+  }, []);
+
+  // result calories
+
+  const result_calories = data.reduce(
+    (sum, item) => sum + Number(item.calories),
+    0,
   );
 
-  function Save() {
-    let oldData = JSON.parse(localStorage.getItem("data")) || [];
+  //Save и setItem
+  const Save = async () => {
+    if (!name.trim() || !lesson.trim() || !time.trim() || !calories.trim()) {
+      return;
+    }
 
-    let newData = {
-      name: name,
-      lesson: lesson,
-      time: time,
-      calories: calories,
-    };
+    try {
+      const response = await axios({
+        method: "POST",
+        url: "https://6aa686bbd7765db985076c1a.mockapi.io/subscription",
+        data: {
+          name: name,
+          lesson: lesson,
+          time: time,
+          calories: calories,
+        },
+      });
 
-    oldData.push(newData);
+      console.log("POST", response);
 
-    localStorage.setItem("data", JSON.stringify(oldData));
+      if (response.status === 201 || response.status === 200) {
+        setName("");
+        setLesson("");
+        setTime("");
+        setCalories("");
 
-    setData(oldData);
+        newData();
 
-    setName("");
-    setLesson("");
-    setTime("");
-    setCalories("");
-
-    alert("Тренировка сохранена");
-  }
+        setShowEditModal(false);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   function Start(item) {
     localStorage.setItem("time", item.time);
@@ -79,31 +141,41 @@ function Home() {
     window.location.href = "/timer";
   }
 
-  function Remove(index) {
-    let newData = [];
+  // DELETE
+  const Remove = async (id) => {
+    try {
+      const response = await axios({
+        method: "DELETE",
+        url: `https://6aa686bbd7765db985076c1a.mockapi.io/subscription/${id}`,
+      });
 
-    for (let i = 0; i < data.length; i++) {
-      if (i !== index) {
-        newData.push(data[i]);
+      console.log("DELETE", response);
+
+      if (response.status === 200) {
+        newData();
       }
+    } catch (error) {
+      console.error(error);
     }
+  };
 
-    localStorage.setItem("data", JSON.stringify(newData));
+  // DELETE
+  const RemoveAll = async (data) => {
+    try {
+      const response = await axios({
+        method: "DELETE",
+        url: `https://6aa686bbd7765db985076c1a.mockapi.io/subscription`,
+      });
 
-    setData(newData);
-  }
+      console.log("DELETE", response);
 
-  function RemoveAll() {
-    localStorage.removeItem("data");
-
-    setData([]);
-  }
-
-  let result_calories = 0;
-
-  for (let i = 0; i < data.length; i++) {
-    result_calories = result_calories + Number(data[i].calories);
-  }
+      if (response.status === 200) {
+        newData();
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="container py-4">
@@ -214,6 +286,7 @@ function Home() {
                         >
                           Редактировать
                         </button>
+
                         {showEditModal && (
                           <div
                             className="modal fade show d-block"
@@ -249,6 +322,22 @@ function Home() {
                                       value={editName}
                                       onChange={(e) =>
                                         setEditName(e.target.value)
+                                      }
+                                    />
+                                  </div>
+
+                                  <div className="mb-3">
+                                    <label className="form-label">
+                                      Название упражнения
+                                    </label>
+
+                                    <input
+                                      type="text"
+                                      className="form-control"
+                                      placeholder="Например: Отжимания"
+                                      value={editText}
+                                      onChange={(e) =>
+                                        setEditText(e.target.value)
                                       }
                                     />
                                   </div>
@@ -305,15 +394,16 @@ function Home() {
                             </div>
                           </div>
                         )}
+
                         <button
                           onClick={() => Start(item)}
                           className="btn btn-primary"
                         >
                           Начать
                         </button>
-                        ;
+
                         <button
-                          onClick={() => Remove(index)}
+                          onClick={() => Remove(item.id)}
                           className="btn btn-danger"
                         >
                           Удалить
