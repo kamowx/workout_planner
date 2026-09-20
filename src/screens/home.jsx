@@ -71,7 +71,6 @@ function Home() {
   const [data, setData] = useState([]);
 
   //GET
-
   const newData = async () => {
     try {
       const response = await axios({
@@ -89,16 +88,19 @@ function Home() {
     }
   };
 
+  const workouts = data.filter((item) => item.history !== 1);
+
   useEffect(() => {
     newData();
   }, []);
 
   // result calories
-
-  const result_calories = data.reduce(
-    (sum, item) => sum + Number(item.calories),
+  const result_calories = workouts.reduce(
+    (sum, item) => sum + (Number(item.calories) || 0),
     0,
   );
+
+  const completedCount = data.filter((item) => item.history === 1).length;
 
   //Save и setItem
   const Save = async () => {
@@ -115,6 +117,7 @@ function Home() {
           lesson: lesson,
           time: time,
           calories: calories,
+          history: 0,
         },
       });
 
@@ -137,6 +140,7 @@ function Home() {
 
   function Start(item) {
     localStorage.setItem("time", item.time);
+    localStorage.setItem("workout", JSON.stringify(item));
 
     window.location.href = "/timer";
   }
@@ -162,7 +166,7 @@ function Home() {
   // DELETE ALL
   const RemoveAll = async () => {
     try {
-      for (let item of data) {
+      for (let item of workouts) {
         await axios({
           method: "DELETE",
           url: `https://6aa686bbd7765db985076c1a.mockapi.io/subscription/${item.id}`,
@@ -197,12 +201,10 @@ function Home() {
               + Добавить тренировку
             </button>
 
-            <a href="history">
+            <a href="/history">
               <button
                 type="button"
                 className="btn btn-primary-custom"
-                data-bs-toggle="modal"
-                data-bs-target="#exampleModal"
               >
                 История
               </button>
@@ -215,9 +217,7 @@ function Home() {
         <div className="col-12 col-md-4">
           <div className="card app-card stat-card1 p-3 h-100">
             <div className="stat-label">Всего тренировок</div>
-
-            <div className="stat-value my-2">{data.length}</div>
-
+            <div className="stat-value my-2">{workouts.length}</div>
             <div className="stat-desc text-muted">
               Все зарегистрированные занятия
             </div>
@@ -227,9 +227,7 @@ function Home() {
         <div className="col-12 col-md-4">
           <div className="card app-card stat-card2 p-3 h-100">
             <div className="stat-label">Калории</div>
-
             <div className="stat-value my-2">{result_calories}</div>
-
             <div className="stat-desc text-muted">Общее количество калорий</div>
           </div>
         </div>
@@ -237,9 +235,9 @@ function Home() {
         <div className="col-12 col-md-4">
           <div className="card app-card stat-card3 p-3 h-100">
             <div className="stat-label">Завершено / Запланировано</div>
-
-            <div className="stat-value my-2">0</div>
-
+            <div className="stat-value my-2">
+              {completedCount} / {workouts.length}
+            </div>
             <div className="stat-desc text-muted">Текущий прогресс цикла</div>
           </div>
         </div>
@@ -257,7 +255,7 @@ function Home() {
             </div>
 
             <div className="workout-list">
-              {data.map((item, index) => (
+              {workouts.map((item, index) => (
                 <div key={index} className="card border-0 shadow-sm mb-3">
                   <div className="card-body">
                     <div className="d-flex justify-content-between align-items-center">

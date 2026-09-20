@@ -3,20 +3,20 @@ import { useEffect, useState } from "react";
 
 function History() {
   // Массив тренировок
-  const [subscriptions, setSubscriptions] = useState([]);
+  const [data, setData] = useState([]);
 
   // GET
-  const subscription = async () => {
+  const newData = async () => {
     try {
       const response = await axios({
         method: "GET",
-        url: "https://6aa686bbd7765db985076c1a.mockapi.io/history",
+        url: "https://6aa686bbd7765db985076c1a.mockapi.io/subscription",
       });
 
-      console.log("GET", response);
+      console.log("GET HISTORY", response);
 
       if (response.status === 200) {
-        setSubscriptions(response.data);
+        setData(response.data);
       }
     } catch (error) {
       console.error(error);
@@ -25,20 +25,23 @@ function History() {
 
   // Получаем данные при открытии
   useEffect(() => {
-    subscription();
+    newData();
   }, []);
+
+  // Фильтр
+  const history = data.filter((item) => item.history === 1);
 
   return (
     <div className="container mt-5 text-center">
       <div className="card p-5">
         <h2>История</h2>
 
-        {subscriptions.length === 0 ? (
+        {history.length === 0 ? (
           <h1>
             <b>Пока что нет</b>
           </h1>
         ) : (
-          subscriptions.map((item, index) => (
+          history.map((item, index) => (
             <div className="card p-3 mt-3" key={index}>
               <h4>{item.name}</h4>
 
@@ -47,6 +50,8 @@ function History() {
               <p>Калории: {item.calories}</p>
 
               <p>Секунд: {item.time}</p>
+
+              <p>Дата: {item.Date}</p>
             </div>
           ))
         )}

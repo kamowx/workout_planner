@@ -6,6 +6,31 @@ function Timer() {
 
   const [start, setStart] = useState(false);
 
+  const [data, setData] = useState([]);
+
+  // GET - получаем общий массив
+  const newData = async () => {
+    try {
+      const response = await axios({
+        method: "GET",
+        url: "https://6aa686bbd7765db985076c1a.mockapi.io/subscription",
+      });
+
+      console.log("GET", response);
+
+      if (response.status === 200) {
+        setData(response.data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // Получаем данные при открытии
+  useEffect(() => {
+    newData();
+  }, []);
+
   useEffect(() => {
     if (start && time > 0) {
       const timer = setTimeout(() => {
@@ -17,28 +42,40 @@ function Timer() {
 
     // Когда таймер дошёл до 0
     if (time === 0 && start === true) {
+      setStart(false);
+
       const SaveHistory = async () => {
         try {
+          // Получаем выбранную тренировку
+          const workout = JSON.parse(localStorage.getItem("workout"));
+
           const newHistory = {
-            seconds: Number(localStorage.getItem("time")),
-            date: new Date().toLocaleDateString(),
-            time: new Date().toLocaleTimeString(),
+            name: workout?.name || "Тренировка",
+            lesson: workout?.lesson || "",
+            calories: workout?.calories || "",
+            time: workout?.time || localStorage.getItem("time") || "0",
+            Date: new Date().toLocaleDateString(),
+            history: 1,
           };
+
+          console.log("Отправляем:", newHistory);
 
           const response = await axios({
             method: "POST",
-            url: "https://6aa686bbd7765db985076c1a.mockapi.io/history",
+            url: "https://6aa686bbd7765db985076c1a.mockapi.io/subscription",
             data: newHistory,
           });
 
-          console.log("POST HISTORY", response);
+          console.log("POST", response);
 
           if (response.status === 201 || response.status === 200) {
-            setStart(false);
+            // Обновляем общий массив
+            newData();
+
             alert("Тренировка завершена!");
           }
         } catch (error) {
-          console.error(error);
+          console.error("Ошибка:", error);
         }
       };
 
